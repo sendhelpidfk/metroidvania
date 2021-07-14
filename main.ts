@@ -18,7 +18,14 @@ let weaponspeed = 200
 
 //ability 1: burst jump
 let burstjumpcharge = 0
-let maxburstjumpcharge = 100
+let maxburstjumpcharge = 300
+let burstjumpchargerate = 5
+let hasburstjumped = false
+let chargingburst = false
+enum buttonstates {notpressed, risingedge, held, fallingedge}
+let abuttonstate = buttonstates.notpressed
+let burstresettimer = 0
+let burstresetrequiredtime = 2
 
 
 
@@ -28,7 +35,8 @@ namespace SpriteKind {
 }
 
 //setup pickups
-enum upgradetypes {}
+enum upgradetypes {boost, burst, tempcharge, total}
+enum tempchargetypes {} //todo: come up with temporary abilities
 
 //define functions
 //effectively an extended version of moveSprite engineered for this game
@@ -60,11 +68,58 @@ function movesprite_gradient(sprite: Sprite, dx: number) {
             sprite.vx = 0 //zero it out immediately - no break mode, no accel to worry about
         }
     }
+    if (chargingburst) {
+        sprite.vx *= .25
+        sprite.vy *= .25
+    }
 }
-//a seperate jump function that gets run from main
+function burstcharge() {
+    if (burstjumpcharge < maxburstjumpcharge) {
+        burstjumpcharge += burstjumpchargerate
+    }
+}
+//a seperate jump function that gets run from main; also handles burst
 function player_jump() {
-    if (spr_player.vy == 0 && controller.A.isPressed()) {
-        spr_player.vy = -155
+    if (controller.A.isPressed()) {
+        //button state management
+        if (abuttonstate == buttonstates.notpressed) { //from not pressed
+            abuttonstate = buttonstates.risingedge
+        } else if (abuttonstate = buttonstates.risingedge) { //from just being pressed
+            abuttonstate = buttonstates.held
+        }
+
+        if (spr_player.vy == 0) {
+            spr_player.vy = -155
+        } else if (!hasburstjumped && abuttonstate == buttonstates.risingedge){
+            //burst jump code
+            chargingburst = true
+            burstcharge()
+        } else if (chargingburst) {
+            burstcharge()
+        }
+    } else { //release burst charge
+        //button state management
+        if (abuttonstate == buttonstates.held) { //from being held
+            abuttonstate = buttonstates.fallingedge
+        } else if (abuttonstate = buttonstates.fallingedge) { //from just being released
+            abuttonstate = buttonstates.notpressed
+        }
+
+        if (chargingburst) {
+            chargingburst = false
+            hasburstjumped = true
+            spr_player.vy = burstjumpcharge * -1
+            burstjumpcharge = 0
+            burstresettimer = 0
+        }
+    }
+    if (spr_player.vy == 0) { //reset burst
+        if (burstresettimer < burstresetrequiredtime) { //if current burst timer is less than required
+            burstresettimer += 1
+            if (burstresettimer < burstresetrequiredtime) {//remember to set it to true if the timer is done
+                hasburstjumped = false
+            }
+        }
     }
 }
 //shoot lmao
@@ -87,7 +142,7 @@ function player_shoot() {
             . . . . . . . . . . . . . . . .
             . . . . . . . . . . . . . . . .
             . . . . . . . . . . . . . . . .
-        `, spr_player, lastdir * weaponspeed, 0)
+        `, spr_player, spr_player.vx + (lastdir * weaponspeed), 0)
     }
 }
 //the big function for all the abilities; currently, just boost
@@ -137,5 +192,3 @@ game.onUpdate(function() {
     movesprite_gradient(spr_player, xaccel)
     console.log(spr_player.vx)
 })
-
-
