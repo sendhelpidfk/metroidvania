@@ -1,0 +1,38 @@
+{
+    "name": "Metroidvania",
+    "description": "",
+    "dependencies": {
+        "device": "*",
+        "Color Fading": "github:jwunderl/pxt-color#v0.2.1",
+        "mouse": "*",
+        "controller": "*",
+        "storyboard": "*",
+        "pxt-button-combos": "github:jwunderl/pxt-button-combos#v0.0.24",
+        "pxt-lantern": "github:riknoll/pxt-lantern#v0.1.1"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md",
+        "assets.json",
+        "tilemap.g.jres",
+        "tilemap.g.ts",
+        "images.g.jres",
+        "images.g.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "branch": "v1.4.45",
+        "tag": "v1.4.45",
+        "commits": "https://github.com/microsoft/pxt-arcade/commits/628e717e680e0728902ef3cc43347b23a3cb327b",
+        "target": "1.4.45",
+        "pxt": "6.12.27",
+        "targetId": "arcade"
+    },
+    "supportedTargets": [
+        "arcade"
+    ],
+    "preferredEditor": "tsprj"
+}
