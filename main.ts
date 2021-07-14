@@ -29,7 +29,7 @@ let abuttonstate = buttonstates.notpressed
 let burstresettimer = 0
 let burstresetrequiredtime = 2
 
-
+//ability 2: boost
 
 //setup sprite kinds (this extends the default makecode ones)
 namespace SpriteKind {
@@ -49,6 +49,15 @@ function handlebuttonstate_press(statevariable: any) {
         statevariable = buttonstates.risingedge
     } else if (statevariable = buttonstates.risingedge) { //from just being pressed
         statevariable = buttonstates.held
+    }
+    return statevariable
+}
+//manage button state progresssion from held -> falling edge -> nothing
+function handlebuttonstate_release(statevariable: any) {
+    if (statevariable == buttonstates.held) { //from being held
+        statevariable = buttonstates.fallingedge
+    } else if (statevariable = buttonstates.fallingedge) { //from just being released
+        statevariable = buttonstates.notpressed
     }
     return statevariable
 }
@@ -105,25 +114,27 @@ function player_jump() {
         } else if (!hasburstjumped && abuttonstate == buttonstates.risingedge){
             //burst jump code
             chargingburst = true
+            spr_player.startEffect(effects.fire)
             burstcharge()
         } else if (chargingburst) {
             burstcharge()
         }
     } else { //release burst charge
         //button state management
-        if (abuttonstate == buttonstates.held) { //from being held
-            abuttonstate = buttonstates.fallingedge
-        } else if (abuttonstate = buttonstates.fallingedge) { //from just being released
-            abuttonstate = buttonstates.notpressed
-        }
+        abuttonstate = handlebuttonstate_release(abuttonstate)
 
         if (chargingburst) {
             music.smallCrash.play()
+            effects.clearParticles(spr_player)
+            spr_player.startEffect(effects.ashes)
+
             chargingburst = false
             hasburstjumped = true
             spr_player.vy = burstjumpcharge * -1
             burstjumpcharge = burstjumpstartingcharge
             burstresettimer = 0
+        } else {
+            effects.clearParticles(spr_player)
         }
     }
     if (spr_player.vy == 0) { //reset burst
@@ -170,6 +181,8 @@ function player_ability_activate() {
     if (controller.down.isPressed()) {
         music.bigCrash.play()
         spr_player.vx = absspeedcap * lastdir //boost
+    } else {
+
     }
 }
 
@@ -198,7 +211,7 @@ tiles.placeOnRandomTile(spr_player, assets.tile`tl_spawn`)
 
 //lights, camera, action
 scene.setBackgroundColor(1)
-tiles.setTilemap(tilemap`lvl_testroom`)
+tiles.setTilemap(tilemap`lvl_bigmap`)
 music.sonar.play()
 color.setPalette(color.GrayScale)
 lantern.startLanternEffect(spr_player)
