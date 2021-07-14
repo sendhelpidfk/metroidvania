@@ -43,13 +43,14 @@ enum tempchargetypes {} //todo: come up with temporary abilities
 
 
 //define functions
-
+//manage button state progresssion from nothing -> rising edge -> held
 function handlebuttonstate_press(statevariable: any) {
     if (statevariable == buttonstates.notpressed) { //from not pressed
         statevariable = buttonstates.risingedge
     } else if (statevariable = buttonstates.risingedge) { //from just being pressed
         statevariable = buttonstates.held
     }
+    return statevariable
 }
 //effectively an extended version of moveSprite engineered for this game
 function movesprite_gradient(sprite: Sprite, dx: number) {
@@ -97,11 +98,7 @@ function burstcharge() {
 function player_jump() {
     if (controller.A.isPressed()) {
         //button state management
-        if (abuttonstate == buttonstates.notpressed) { //from not pressed
-            abuttonstate = buttonstates.risingedge
-        } else if (abuttonstate = buttonstates.risingedge) { //from just being pressed
-            abuttonstate = buttonstates.held
-        }
+        abuttonstate = handlebuttonstate_press(abuttonstate)
 
         if (spr_player.vy == 0) {
             spr_player.vy = -155
