@@ -5,20 +5,22 @@ DESIGN GOALS:
 */
 
 //playervars
-let xdamper = 2
+let xdamper = 5
 let xaccel = 150
 let breakspeedcap = 150 //threshhold under normal circumstances
 let absspeedcap = 300 //the absolute speed limit
-let lastdir = 0
+let lastdir = 1
 
 //weapon
 let currentcooldown = 0
-let cooldown = 100
+let cooldown = 15
 let weaponspeed = 200
+let canshoot = true
 
 //ability 1: burst jump
-let burstjumpcharge = 0
-let maxburstjumpcharge = 300
+let burstjumpstartingcharge = 100
+let burstjumpcharge = burstjumpstartingcharge
+let maxburstjumpcharge = 200
 let burstjumpchargerate = 5
 let hasburstjumped = false
 let chargingburst = false
@@ -38,7 +40,17 @@ namespace SpriteKind {
 enum upgradetypes {boost, burst, tempcharge, total}
 enum tempchargetypes {} //todo: come up with temporary abilities
 
+
+
 //define functions
+
+function handlebuttonstate_press(statevariable: any) {
+    if (statevariable == buttonstates.notpressed) { //from not pressed
+        statevariable = buttonstates.risingedge
+    } else if (statevariable = buttonstates.risingedge) { //from just being pressed
+        statevariable = buttonstates.held
+    }
+}
 //effectively an extended version of moveSprite engineered for this game
 function movesprite_gradient(sprite: Sprite, dx: number) {
     let inputx = controller.dx(dx) //input scaled with speed
@@ -59,7 +71,7 @@ function movesprite_gradient(sprite: Sprite, dx: number) {
         }
     } else { //no, dpad IS NOT pressed
         if (breakModeActive) {
-            if (Math.abs(sprite.vx) >= lastdir * sprite.vx * xdamper) { //if greater than or equal to the damping value
+            if (Math.abs(sprite.vx) >= Math.abs((lastdir * Math.sign(sprite.vx)) + (Math.sign(sprite.vx) * xdamper))) { //if greater than or equal to the damping value
                 sprite.vx -= Math.sign(sprite.vx) * xdamper //reduce by damping value
             } else {
                 sprite.vx = 0 //otherwise, zero it out manually to avoid overshooting into perpetuity
@@ -73,10 +85,13 @@ function movesprite_gradient(sprite: Sprite, dx: number) {
         sprite.vy *= .25
     }
 }
+//a function to automatically handle charging up burst
 function burstcharge() {
     if (burstjumpcharge < maxburstjumpcharge) {
         burstjumpcharge += burstjumpchargerate
     }
+    let burstjumpnote = burstjumpcharge / maxburstjumpcharge * 500
+    music.playTone(burstjumpnote, 13)
 }
 //a seperate jump function that gets run from main; also handles burst
 function player_jump() {
@@ -106,10 +121,11 @@ function player_jump() {
         }
 
         if (chargingburst) {
+            music.smallCrash.play()
             chargingburst = false
             hasburstjumped = true
             spr_player.vy = burstjumpcharge * -1
-            burstjumpcharge = 0
+            burstjumpcharge = burstjumpstartingcharge
             burstresettimer = 0
         }
     }
@@ -124,7 +140,7 @@ function player_jump() {
 }
 //shoot lmao
 function player_shoot() {
-    if (controller.B.isPressed()) {
+    if (controller.B.isPressed() && canshoot && currentcooldown <= 0) {
         let prj_playerbullet = sprites.createProjectileFromSprite(img`
             . . . . . . . . . . . . . . . .
             . . . . . . . . . . . . . . . .
@@ -143,11 +159,19 @@ function player_shoot() {
             . . . . . . . . . . . . . . . .
             . . . . . . . . . . . . . . . .
         `, spr_player, spr_player.vx + (lastdir * weaponspeed), 0)
+        canshoot = false
+        currentcooldown = cooldown
+    } else {
+        canshoot = true
+        if (currentcooldown > 0) {
+            currentcooldown -= 1
+        }
     }
 }
 //the big function for all the abilities; currently, just boost
 function player_ability_activate() {
     if (controller.down.isPressed()) {
+        music.bigCrash.play()
         spr_player.vx = absspeedcap * lastdir //boost
     }
 }
