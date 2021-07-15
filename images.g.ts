@@ -355,6 +355,25 @@ f1ffffffcf1f1fe
 ....f1fff1ff...
 ...f1f11ff11f..
 `;
+            case "image3":
+            case "myImage0":return img`
+f f f f f f f f 1 1 1 1 1 1 1 1 
+f 1 1 1 1 1 1 f 1 f f f f f f 1 
+f 1 f f f f 1 f 1 f 1 1 1 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f 1 1 f 1 f 1 f 1 f f 1 f 1 
+f 1 f f f f 1 f 1 f 1 1 1 1 f 1 
+f 1 1 1 1 1 1 f 1 f f f f f f 1 
+f f f f f f f f 1 1 1 1 1 1 1 1 
+`;
         }
         return null;
     })
