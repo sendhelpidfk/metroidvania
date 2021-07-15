@@ -4,11 +4,13 @@ DESIGN GOALS:
 -Above that threshhold, you enter 'break mode' - controls get more slippery and you need to maintain velocity
 */
 
+game.splash("This is an early build; 2/3 abilities are pre-unlocked and the map isn't finished by any means")
+
 //unlocks
 enum upgradetypes {none, gun, boost, burst, tempcharge, total}
 enum tempchargetypes {none, total} //todo: come up with temporary abilities
 let hasburst = true
-let hasboost = false
+let hasboost = true
 let hasgun = false
 let currenttempcharge = tempchargetypes.none
 
@@ -138,7 +140,7 @@ class shootable {
         }
     }
     attack() {
-        console.log(this.health)
+        //console.log(this.health)
         if (this.health > 0) { //dead enemies don't shoot
             if (this.attacktimer == 0) {
                 let enemyprojectile = sprites.create(img`
@@ -341,7 +343,7 @@ function updatehud() {
     spr_energy.x = spr_player.x - 56
     spr_energy.y = spr_player.y - 50
     spr_energy.setText(energy.toString())
-    console.log(energy)
+    //console.log(energy)
 }
 
 //setup player
@@ -403,8 +405,8 @@ game.onUpdate(function() {
     player_ability_activate()
     player_shoot()
     movesprite_gradient(spr_player, xaccel)
-    //console.log(spr_player.x)
-    //console.log(spr_player.y)
+    console.log(spr_player.x)
+    console.log(spr_player.y)
 
     updatehud()
 
