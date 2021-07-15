@@ -4,6 +4,14 @@ DESIGN GOALS:
 -Above that threshhold, you enter 'break mode' - controls get more slippery and you need to maintain velocity
 */
 
+//unlocks
+enum upgradetypes {none, gun, boost, burst, tempcharge, total}
+enum tempchargetypes {none, total} //todo: come up with temporary abilities
+let hasburst = false
+let hasboost = false
+let hasgun = false
+let currenttempcharge = tempchargetypes.none
+
 //playervars
 let xdamper = 5
 let xaccel = 150
@@ -36,11 +44,49 @@ namespace SpriteKind {
     export const Upgrade = SpriteKind.create()
 }
 
-//setup pickups
-enum upgradetypes {boost, burst, tempcharge, total}
-enum tempchargetypes {} //todo: come up with temporary abilities
-
-
+class upgrade{
+    upgradetype: upgradetypes
+    tempchargetype: tempchargetypes
+    spriteid: Sprite
+    constructor(newtype: upgradetypes, newtempchargetype: tempchargetypes) {
+        this.spriteid = sprites.create(img`
+            . . . . . . . . . . . . . . . .
+            . . . . . . . . . . . . . . . .
+            . . b b b b b b b b b b b b . .
+            . . b . . . . . . . . . . b . .
+            . . b . b b b b b b b b . b . .
+            . . b . b . . . . . . b . b . .
+            . . b . b . b b b b . b . b . .
+            . . b . b . b . . b . b . b . .
+            . . b . b . b . . b . b . b . .
+            . . b . b . b b b b . b . b . .
+            . . b . b . . . . . . b . b . .
+            . . b . b b b b b b b b . b . .
+            . . b . . . . . . . . . . b . .
+            . . b b b b b b b b b b b b . .
+            . . . . . . . . . . . . . . . .
+            . . . . . . . . . . . . . . . .
+        `)
+        this.upgradetype = newtype
+        this.tempchargetype = newtempchargetype
+    }
+    collect() {
+        if (this.spriteid.overlapsWith(spr_player)) {
+            switch(this.upgradetype) {
+                case upgradetypes.gun:
+                    hasgun = true
+                    break
+                case upgradetypes.boost:
+                    hasboost = true
+                    break
+                case upgradetypes.burst:
+                    hasburst = true
+                    break
+            }
+            this.spriteid.destroy()
+        }
+    }
+}
 
 //define functions
 //manage button state progresssion from nothing -> rising edge -> held
@@ -111,12 +157,12 @@ function player_jump() {
 
         if (spr_player.vy == 0) {
             spr_player.vy = -155
-        } else if (!hasburstjumped && abuttonstate == buttonstates.risingedge){
+        } else if (hasburst && !hasburstjumped && abuttonstate == buttonstates.risingedge){
             //burst jump code
             chargingburst = true
             spr_player.startEffect(effects.fire)
             burstcharge()
-        } else if (chargingburst) {
+        } else if (hasburst && chargingburst) {
             burstcharge()
         }
     } else { //release burst charge
@@ -148,39 +194,43 @@ function player_jump() {
 }
 //shoot lmao
 function player_shoot() {
-    if (controller.B.isPressed() && canshoot && currentcooldown <= 0) {
-        let prj_playerbullet = sprites.createProjectileFromSprite(img`
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . f f . . . . . . .
-            . . . . . . f 1 1 f . . . . . .
-            . . . . . . f 1 1 f . . . . . .
-            . . . . . . . f f . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-            . . . . . . . . . . . . . . . .
-        `, spr_player, spr_player.vx + (lastdir * weaponspeed), 0)
-        canshoot = false
-        currentcooldown = cooldown
-    } else {
-        canshoot = true
-        if (currentcooldown > 0) {
-            currentcooldown -= 1
+    if (hasgun) {
+        if (controller.B.isPressed() && canshoot && currentcooldown <= 0) {
+            let prj_playerbullet = sprites.createProjectileFromSprite(img`
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . f f . . . . . . .
+                . . . . . . f 1 1 f . . . . . .
+                . . . . . . f 1 1 f . . . . . .
+                . . . . . . . f f . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+                . . . . . . . . . . . . . . . .
+            `, spr_player, spr_player.vx + (lastdir * weaponspeed), 0)
+            canshoot = false
+            currentcooldown = cooldown
+        } else {
+            canshoot = true
+            if (currentcooldown > 0) {
+                currentcooldown -= 1
+            }
         }
     }
 }
 //the big function for all the abilities; currently, just boost
 function player_ability_activate() {
     if (controller.down.isPressed()) {
-        music.bigCrash.play()
-        spr_player.vx = absspeedcap * lastdir //boost
+        if (hasboost) {
+            music.bigCrash.play()
+            spr_player.vx = absspeedcap * lastdir //boost
+        }
     } else {
 
     }
@@ -205,6 +255,8 @@ let spr_player: Sprite = sprites.create(img`
     f . . . . . . . . . . . . . . f 
     f f f f f f f f f f f f f f f f 
     `, SpriteKind.Player)
+spr_player.x = 1000
+spr_player.y = 40
 spr_player.ay = 350
 scene.cameraFollowSprite(spr_player)
 tiles.placeOnRandomTile(spr_player, assets.tile`tl_spawn`)
@@ -224,5 +276,6 @@ game.onUpdate(function() {
     player_ability_activate()
     player_shoot()
     movesprite_gradient(spr_player, xaccel)
-    console.log(spr_player.vx)
+    console.log(spr_player.x)
+    console.log(spr_player.y)
 })
