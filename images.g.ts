@@ -355,6 +355,46 @@ f1ffffffcf1f1fe
 ....f1fff1ff...
 ...f1f11ff11f..
 `;
+            case "image3":
+            case "myImage0":return img`
+.......ffff....
+.....ff1111ff..
+....f31111113f.
+....f21111111f.
+...f2211111112f
+...f2221111112f
+...f2222221112f
+...f322223f212f
+...fc3322cf223f
+....fc3111111f.
+.....fcc13131f.
+......ff3f3f3f.
+......f1f.f.f..
+..ffff111fffe..
+.f1111c1c11b.e.
+f1fccc111ccb.e.
+f1f111c1c11b.ee
+f1ffcc111ccb..e
+f1ffffffcf1f1fe
+.f111111f1fbf.e
+..ffffffcf1f1fe
+...f1111111b..e
+...f1c111c1b.ee
+....f11f11fb.e.
+.....ff.ff.b.e.
+....f1f.f1f.e..
+....f1f.f1f....
+....f1f.f1f....
+....f1f.f1f....
+.....f...f.....
+....f1f.f1f....
+....f1f.f1f....
+....f1f.f1f....
+....f1f.f1f....
+.....f...f.....
+....f1fff1ff...
+...f1f11ff11f..
+`;
         }
         return null;
     })

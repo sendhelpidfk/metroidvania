@@ -49,6 +49,11 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "myImage"
     },
+    "image3": {
+        "data": "hwQPACUAAAAAAAAAAAAA8P8PAAAAAAAAAAAAAAAAAAAAAAAfEfEAAAAAAAAAAAAAAAAAAAAA8PH/Hw8AAAAAAAAAAAAAAP//DwDwwfEf/w8AAAAAAAAPAAD/IjL8APDBwR8f8fD/D///8AEA8CMiIsMP8MHBHx8cHxHxEREfDwDwESEiM/wfHBwfHxH//w////ABAB8RESIS/BERER8f8QAAAAAA8AEAHxERIhIxHxwc/BwR//8P///wDwAfEREyHPPwwcEfHxwfEfERER8PAB8REfEfMf/BwfER8fD/D///8AEA8BERIRLz8Lu7v7+7CwAAAADwAQDwExEREjHvAADxAQDgAAAAAAAPAAD/IiLz/wDuDg8P7g4AAAAAAAAAAAD//w8AAADu7u4OAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "myImage0"
+    },
     "qI4}dhSu+IZ+?MezsPjo": {
         "namespace": "myImages",
         "id": "qI4}dhSu+IZ+?MezsPjo",
